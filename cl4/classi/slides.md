@@ -652,7 +652,7 @@ Il problema è che base e altezza sono public: chiunque, dal main, può metterci
 
 <div class="grid grid-cols-2 gap-8 mt-4">
 
-<div v-click class="border-2 border-gray-400 rounded-lg p-4">
+<div v-click="1" class="border-2 border-gray-400 rounded-lg p-4">
 
 ### A. Il `main`
 
@@ -665,7 +665,7 @@ if (r.base <= 0)
 }
 ```
 
-<v-clicks>
+<v-clicks :at="2">
 
 - ❌ Va ripetuto per **ogni** rettangolo e **ogni** dato
 - ❌ Basta **dimenticarlo una volta**
@@ -675,7 +675,7 @@ if (r.base <= 0)
 
 </div>
 
-<div v-click class="border-2 border-purple-500 rounded-lg p-4">
+<div v-click="5" class="border-2 border-purple-500 rounded-lg p-4">
 
 ### B. Il rettangolo stesso
 
@@ -685,7 +685,7 @@ if (r.base <= 0)
 
 </div>
 
-<v-clicks>
+<v-clicks :at="6">
 
 - ✅ Il controllo si scrive **una volta**, dentro la classe
 - ✅ Vale per **tutti** gli oggetti
@@ -697,7 +697,7 @@ if (r.base <= 0)
 
 </div>
 
-<div v-click class="mt-6 text-center text-xl">
+<div v-click="9" class="mt-6 text-center text-xl">
 
 Serve un modo per **chiudere** i dati dentro la classe 🔒
 
@@ -830,6 +830,19 @@ public:
     {
         return 2 * (base + altezza);
     }
+};
+```
+
+```cpp
+class Rettangolo
+{
+private:
+    float base;
+    float altezza;
+
+public:
+    float calcolaArea() { return base * altezza; }
+    float calcolaPerimetro() { return 2 * (base + altezza); }
 };
 ```
 
