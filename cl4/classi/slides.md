@@ -118,7 +118,7 @@ float calcolaPerimetro(float base, float altezza)
 }
 ```
 
-```cpp {all|4-8|10-18}
+```cpp {all|4-8|4-8|10-18}
 #include <iostream>
 using namespace std;
 
@@ -151,7 +151,7 @@ float calcolaPerimetro(Rettangolo r)
 <div>
 
 ````md magic-move {at:3}
-```cpp {all|11-12}
+```cpp {all|11-12|all}
 int main()
 {
     float base, altezza;
@@ -172,7 +172,49 @@ int main()
 }
 ```
 
-```cpp {all|3,7,9|11-12}
+```cpp {3}
+int main()
+{
+    Rettangolo r;
+    float area, perimetro;
+
+    cout << "Inserisci la base del rettangolo: ";
+    cin >> base;
+    cout << "Inserisci l'altezza del rettangolo: ";
+    cin >> altezza;
+
+    area = calcolaArea(base, altezza);
+    perimetro = calcolaPerimetro(base, altezza);
+
+    cout << "Area: " << area << endl;
+    cout << "Perimetro: " << perimetro << endl;
+
+    return 0;
+}
+```
+
+```cpp {7,9}
+int main()
+{
+    Rettangolo r;
+    float area, perimetro;
+
+    cout << "Inserisci la base del rettangolo: ";
+    cin >> r.base;
+    cout << "Inserisci l'altezza del rettangolo: ";
+    cin >> r.altezza;
+
+    area = calcolaArea(base, altezza);
+    perimetro = calcolaPerimetro(base, altezza);
+
+    cout << "Area: " << area << endl;
+    cout << "Perimetro: " << perimetro << endl;
+
+    return 0;
+}
+```
+
+```cpp {11-12}
 int main()
 {
     Rettangolo r;
@@ -204,9 +246,11 @@ int main()
 Il main ora dice COSA fare, le funzioni dicono COME farlo.
 Domanda: base e altezza viaggiano sempre in coppia... e se le tenessimo insieme?
 
-[click] Arriva la struct: il codice si trasforma.
+[click] Arriva la struct: cambiano le funzioni a sinistra. Il main a destra è ancora quello vecchio e così non compila più: va aggiornato, una riga alla volta.
 
-[click] La struct definisce un nuovo tipo, Rettangolo, che raggruppa base e altezza. Nel main dichiariamo una variabile r di quel tipo e accediamo ai campi con il punto: r.base, r.altezza.
+[click] La struct definisce un nuovo tipo, Rettangolo, che raggruppa base e altezza. Nel main le due variabili diventano una sola variabile r di quel tipo.
+
+[click] Ai campi si accede con il punto: r.base, r.altezza.
 
 [click] Le funzioni ricevono un solo parametro, il rettangolo intero: non si possono più scambiare base e altezza per errore.
 -->
