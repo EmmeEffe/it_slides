@@ -1,0 +1,15 @@
+{
+  "name": "presentazioni",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "slidev --open",
+    "build": "node scripts/build.mjs",
+    "export": "slidev export"
+  },
+  "dependencies": {
+    "@slidev/cli": "^53.0.0",
+    "@slidev/theme-default": "latest",
+    "vue": "^3.5.33"
+  }
+}
