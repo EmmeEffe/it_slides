@@ -23,6 +23,8 @@ jobs:
         with:
           node-version: lts/*
       - run: npm ci
+      # browser usato da Slidev per esportare le slide in PDF
+      - run: npx playwright install --with-deps chromium
       - run: npm run build
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

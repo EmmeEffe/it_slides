@@ -1,5 +1,6 @@
-// Compila tutte le presentazioni (cartelle cl<N>/<argomento>/slides.md) in dist/
-// e crea dist/index.html con l'elenco.
+// Compila tutte le presentazioni (cartelle cl<N>/<argomento>/slides.md) in dist/,
+// esporta ciascuna anche in PDF e crea dist/index.html con l'elenco.
+// Con `npm run build -- --senza-pdf` salta l'esportazione PDF (più veloce in locale).
 
 import { execFileSync } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
@@ -10,6 +11,10 @@ const dist = join(radice, 'dist')
 
 // su GitHub Actions il sito è pubblicato in /<nome-repo>/
 const repo = process.env.GITHUB_REPOSITORY?.split('/')[1] ?? 'presentazioni'
+
+const conPdf = !process.argv.includes('--senza-pdf')
+// nome che Slidev dà al PDF esportato con --download
+const filePdf = 'slidev-exported.pdf'
 
 const sottocartelle = dir => readdirSync(dir, { withFileTypes: true })
   .filter(d => d.isDirectory())
@@ -30,6 +35,7 @@ const classi = sottocartelle(radice)
       .filter(argomento => existsSync(join(radice, classe, argomento, 'slides.md')))
       .map(argomento => ({
         cartella: `${classe}/${argomento}`,
+        argomento,
         titolo: titolo(join(radice, classe, argomento, 'slides.md')) ?? argomento,
       })),
   }))
@@ -48,6 +54,9 @@ for (const { presentazioni } of classi) {
       `/${repo}/${cartella}/`,
       '--out',
       join(dist, cartella),
+      // esporta il PDF nella cartella della presentazione e mostra il pulsante di download;
+      // --with-clicks crea una pagina per ogni click (animazioni ed evidenziazioni del codice)
+      ...(conPdf ? ['--download', '--with-clicks'] : []),
     ], { cwd: radice, stdio: 'inherit' })
   }
 }
@@ -56,7 +65,7 @@ const sezioni = classi.map(({ classe, presentazioni }) => `
     <section>
       <h2>Classe ${classe.slice(2)}ª</h2>
       <ul>
-${presentazioni.map(p => `        <li><a href="${p.cartella}/">${p.titolo}</a></li>`).join('\n')}
+${presentazioni.map(p => `        <li><a href="${p.cartella}/">${p.titolo}</a>${conPdf ? ` <a class="pdf" href="${p.cartella}/${filePdf}" download="${p.argomento}.pdf">PDF</a>` : ''}</li>`).join('\n')}
       </ul>
     </section>`).join('\n')
 
@@ -78,6 +87,7 @@ writeFileSync(join(dist, 'index.html'), `<!doctype html>
     ul { padding-left: 1.2rem; }
     a { color: var(--link); text-decoration: none; }
     a:hover { text-decoration: underline; }
+    a.pdf { margin-left: 0.5rem; padding: 0 0.4rem; border: 1px solid var(--bordo); border-radius: 4px; font-size: 0.8rem; }
   </style>
 </head>
 <body>
