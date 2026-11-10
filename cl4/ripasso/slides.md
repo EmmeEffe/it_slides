@@ -806,3 +806,798 @@ Deve scendere la **stessa** variabile che controlla il caso base: `prodotto(n - 
 💡 **Va bene anche al contrario**: si può far scendere `m` invece di `n`, scrivendo `if (m == 0) return 0;` e `return n + prodotto(n, m - 1);`. L'importante è che a ogni chiamata il problema si **avvicini** al caso base.
 
 </div>
+
+---
+layout: section
+---
+
+# Esercizio 2
+
+Le struct: punti nel piano cartesiano
+
+---
+
+# Esercizio 2
+
+<div class="text-xl leading-relaxed mt-6 border-l-4 border-blue-500 pl-6">
+
+Definisci una `struct` **Punto** che rappresenti un punto del piano cartesiano. Scrivi poi due funzioni:
+
+- `distanza`, che riceve due punti e restituisce la loro **distanza**
+- `puntoMedio`, che riceve due punti e restituisce il loro **punto medio**
+
+Nel `main` leggi da tastiera le coordinate di due punti e stampa la distanza e il punto medio.
+
+</div>
+
+<div class="mt-8 text-center text-xl border-2 border-yellow-500 rounded-lg p-4 bg-yellow-500/10">
+
+✋ Fermati qui e prova a scriverlo da solo prima di andare avanti
+
+</div>
+
+---
+
+# L'idea: un punto sono due numeri che stanno insieme
+
+<div class="grid grid-cols-[2fr_3fr] gap-8 mt-2">
+<div>
+
+<svg viewBox="0 0 220 190" class="w-full">
+  <line x1="10" y1="170" x2="210" y2="170" stroke="currentColor" stroke-opacity="0.6" />
+  <line x1="30" y1="185" x2="30" y2="5" stroke="currentColor" stroke-opacity="0.6" />
+  <line x1="60" y1="140" x2="150" y2="140" stroke="#eab308" stroke-width="2" stroke-dasharray="5 4" />
+  <line x1="150" y1="140" x2="150" y2="20" stroke="#eab308" stroke-width="2" stroke-dasharray="5 4" />
+  <text x="118" y="133" text-anchor="middle" fill="#ca8a04" style="font-size: 11px">dx = 3</text>
+  <text x="156" y="84" fill="#ca8a04" style="font-size: 11px">dy = 4</text>
+  <line x1="60" y1="140" x2="150" y2="20" stroke="currentColor" stroke-width="2.5" />
+  <text x="88" y="70" fill="currentColor" style="font-size: 12px" text-anchor="end">d = 5</text>
+  <circle cx="105" cy="80" r="5" fill="#22c55e" />
+  <text x="114" y="84" fill="#16a34a" style="font-size: 13px; font-weight: bold">M</text>
+  <circle cx="60" cy="140" r="6" fill="#3b82f6" />
+  <text x="46" y="160" fill="#3b82f6" style="font-size: 13px; font-weight: bold">A (1, 1)</text>
+  <circle cx="150" cy="20" r="6" fill="#3b82f6" />
+  <text x="160" y="24" fill="#3b82f6" style="font-size: 13px; font-weight: bold">B (4, 5)</text>
+</svg>
+
+</div>
+<div>
+
+<div v-click="1">
+
+**Distanza** (teorema di Pitagora) e **punto medio**:
+
+$$
+d = \sqrt{dx^2 + dy^2} \qquad M = \left( \frac{x_A + x_B}{2},\ \frac{y_A + y_B}{2} \right)
+$$
+
+</div>
+
+<div v-click="2" class="mt-4">
+
+Senza struct, ogni punto sono **due variabili sciolte**:
+
+```cpp
+float distanza(float x1, float y1, float x2, float y2)
+```
+
+4 parametri, facili da scambiare. E il punto medio? Una funzione restituisce **un solo** valore...
+
+</div>
+
+<div v-click="3" class="mt-4">
+
+Con la struct, `x` e `y` viaggiano **insieme**:
+
+```cpp
+float distanza(Punto a, Punto b)
+Punto puntoMedio(Punto a, Punto b)
+```
+
+</div>
+
+</div>
+</div>
+
+<!--
+È lo stesso ragionamento della lezione sulle classi: base e altezza viaggiavano separate, la struct Rettangolo le ha messe insieme.
+-->
+
+---
+
+# Definire e usare la struct
+
+<div class="grid grid-cols-2 gap-8">
+<div>
+
+```cpp {all|1|3-4|5} {at:1}
+struct Punto
+{
+    float x;
+    float y;
+};
+```
+
+<div v-click="4" class="mt-6">
+
+```cpp
+Punto a;     // una variabile di tipo Punto
+a.x = 1;     // con il punto si accede ai campi
+a.y = 1;
+```
+
+<div class="flex justify-center mt-4">
+  <div class="border-2 border-blue-500 rounded-lg px-4 py-2 font-mono">
+    <div class="text-xs uppercase opacity-60 font-sans">Punto <span class="normal-case font-mono">a</span></div>
+    <div class="flex gap-6"><span>x = 1</span><span>y = 1</span></div>
+  </div>
+</div>
+
+</div>
+
+</div>
+<div class="flex flex-col gap-4">
+
+<div v-click="1" class="border-l-4 border-gray-400 pl-4">
+
+`struct` e il **nome** del nuovo tipo, con la maiuscola (come `Rettangolo`)
+
+</div>
+
+<div v-click="2" class="border-l-4 border-blue-500 pl-4">
+
+I **campi**: le variabili che ogni `Punto` contiene
+
+</div>
+
+<div v-click="3" class="border-l-4 border-red-500 pl-4">
+
+Il **`;`** dopo la graffa: senza, il programma non compila!
+
+</div>
+
+<div v-click="5" class="border-l-4 border-yellow-500 pl-4">
+
+`Punto` è il **tipo**, `a` è la **variabile**, come `float` e un numero. I campi si usano sulla variabile: `a.x`, mai `Punto.x`
+
+</div>
+
+</div>
+</div>
+
+---
+
+# La funzione `distanza`
+
+<div class="grid grid-cols-2 gap-8">
+<div>
+
+````md magic-move
+```cpp
+float distanza(Punto a, Punto b)
+{
+
+}
+```
+
+```cpp
+float distanza(Punto a, Punto b)
+{
+    float dx = b.x - a.x;
+    float dy = b.y - a.y;
+}
+```
+
+```cpp
+float distanza(Punto a, Punto b)
+{
+    float dx = b.x - a.x;
+    float dy = b.y - a.y;
+    return sqrt(dx * dx + dy * dy);
+}
+```
+````
+
+</div>
+<div class="flex flex-col gap-4">
+
+<div class="border-l-4 border-gray-400 pl-4">
+
+**L'intestazione**: riceve due `Punto` come parametri e restituisce un `float`, perché la distanza è un numero
+
+</div>
+
+<div v-click="1" class="border-l-4 border-yellow-500 pl-4">
+
+**`dx` e `dy`**: di quanto si sposta B rispetto ad A, in orizzontale e in verticale. Leggiamo i campi con il punto: `b.x`, `a.x`, ...
+
+</div>
+
+<div v-click="2" class="border-l-4 border-green-500 pl-4">
+
+**Pitagora**: $d = \sqrt{dx^2 + dy^2}$
+
+- `sqrt` è la radice quadrata: serve `#include <cmath>`
+- il quadrato si scrive `dx * dx`
+
+</div>
+
+</div>
+</div>
+
+---
+
+# La funzione `puntoMedio`
+
+<div class="grid grid-cols-2 gap-8">
+<div>
+
+````md magic-move
+```cpp
+Punto puntoMedio(Punto a, Punto b)
+{
+
+}
+```
+
+```cpp
+Punto puntoMedio(Punto a, Punto b)
+{
+    Punto m;
+}
+```
+
+```cpp
+Punto puntoMedio(Punto a, Punto b)
+{
+    Punto m;
+    m.x = (a.x + b.x) / 2;
+    m.y = (a.y + b.y) / 2;
+}
+```
+
+```cpp
+Punto puntoMedio(Punto a, Punto b)
+{
+    Punto m;
+    m.x = (a.x + b.x) / 2;
+    m.y = (a.y + b.y) / 2;
+    return m;
+}
+```
+````
+
+</div>
+<div class="flex flex-col gap-4">
+
+<div class="border-l-4 border-gray-400 pl-4">
+
+**Il tipo restituito è `Punto`**: la funzione non restituisce un numero, ma un punto intero
+
+</div>
+
+<div v-click="1" class="border-l-4 border-blue-500 pl-4">
+
+Creiamo una variabile **locale** `m`: il punto da costruire
+
+</div>
+
+<div v-click="2" class="border-l-4 border-yellow-500 pl-4">
+
+Riempiamo i campi con la **media** delle coordinate. Le parentesi sono indispensabili: prima la somma, poi la divisione
+
+</div>
+
+<div v-click="3" class="border-l-4 border-green-500 pl-4">
+
+Restituiamo `m`: `x` e `y` tornano al `main` **insieme**. Senza struct una funzione non potrebbe restituire due valori
+
+</div>
+
+</div>
+</div>
+
+---
+
+# Il programma completo
+
+<div class="grid grid-cols-2 gap-6" style="--slidev-code-font-size: 11px; --slidev-code-line-height: 16px">
+<div>
+
+```cpp {all|2|5-9|11-24|all|all|all|all} {at:1}
+#include <iostream>
+#include <cmath>
+using namespace std;
+
+struct Punto
+{
+    float x;
+    float y;
+};
+
+float distanza(Punto a, Punto b)
+{
+    float dx = b.x - a.x;
+    float dy = b.y - a.y;
+    return sqrt(dx * dx + dy * dy);
+}
+
+Punto puntoMedio(Punto a, Punto b)
+{
+    Punto m;
+    m.x = (a.x + b.x) / 2;
+    m.y = (a.y + b.y) / 2;
+    return m;
+}
+```
+
+</div>
+<div>
+
+```cpp {all|all|all|all|3|5-8|10|12-15} {at:1}
+int main()
+{
+    Punto a, b, m;
+
+    cout << "Coordinate di A (x y): ";
+    cin >> a.x >> a.y;
+    cout << "Coordinate di B (x y): ";
+    cin >> b.x >> b.y;
+
+    m = puntoMedio(a, b);
+
+    cout << "Distanza: " << distanza(a, b) << endl;
+    cout << "Punto medio: (" << m.x
+         << ", " << m.y << ")" << endl;
+
+    return 0;
+}
+```
+
+<div class="mt-3 text-sm">
+<div v-if="$clicks === 1"><code>#include &lt;cmath&gt;</code> serve per usare <code>sqrt</code></div>
+<div v-if="$clicks === 2">La struct va definita <b>prima</b> delle funzioni e del <code>main</code> che la usano</div>
+<div v-if="$clicks === 3">Poi le due funzioni, come le abbiamo scritte</div>
+<div v-if="$clicks === 4">Nel <code>main</code> tre variabili di tipo <code>Punto</code></div>
+<div v-if="$clicks === 5"><code>cin</code> legge direttamente nei campi: <code>cin &gt;&gt; a.x &gt;&gt; a.y;</code> legge due numeri separati da uno spazio</div>
+<div v-if="$clicks === 6"><code>puntoMedio</code> restituisce un <code>Punto</code> intero, che salviamo in <code>m</code></div>
+<div v-if="$clicks === 7">Per stampare un punto si stampano i suoi campi, uno alla volta</div>
+</div>
+
+</div>
+</div>
+
+---
+
+# Prova con il piano cartesiano
+
+<DemoPunto />
+
+<!--
+Provare: A e B sulla stessa riga (dy = 0), A e B coincidenti (distanza 0), coordinate negative, e un caso con la distanza non intera.
+-->
+
+---
+
+# 🔍 Trova l'errore: struct
+
+<div class="text-lg mt-6">
+
+Stesso gioco dell'esercizio 1: **6 versioni** del programma del punto, ognuna con **un errore**.
+
+</div>
+
+<div class="grid grid-cols-3 gap-6 mt-10">
+
+<div class="border-2 border-gray-400 rounded-lg p-4">
+  <div class="text-3xl mb-2">🕵️</div>
+  <div class="font-bold mb-1">1. Leggi l'indizio</div>
+  <div class="text-sm">Un errore di compilazione o un risultato sbagliato</div>
+</div>
+
+<div class="border-2 border-yellow-500 rounded-lg p-4">
+  <div class="text-3xl mb-2">👉</div>
+  <div class="font-bold mb-1">2. Trova la riga</div>
+  <div class="text-sm">Cerca la riga sbagliata e prova a spiegare <b>perché</b> causa quel problema</div>
+</div>
+
+<div class="border-2 border-green-500 rounded-lg p-4">
+  <div class="text-3xl mb-2">✅</div>
+  <div class="font-bold mb-1">3. Vai avanti</div>
+  <div class="text-sm">Al primo passo si evidenzia l'errore, al secondo compare la correzione</div>
+</div>
+
+</div>
+
+---
+
+# 🔍 Trova l'errore <span class="text-2xl opacity-50">struct · 1 / 6</span>
+
+<div class="grid grid-cols-2 gap-6 mt-2">
+<div>
+
+````md magic-move
+```cpp {all|5}
+struct Punto
+{
+    float x;
+    float y;
+}
+
+float distanza(Punto a, Punto b)
+{
+```
+
+```cpp {5}
+struct Punto
+{
+    float x;
+    float y;
+};
+
+float distanza(Punto a, Punto b)
+{
+```
+````
+
+</div>
+<div class="flex flex-col gap-3">
+
+<div class="p-3 rounded-lg border-2 border-gray-400">
+<div class="text-xs uppercase opacity-60">Indizio</div>
+
+Il programma **non compila**:
+
+<div class="font-mono text-xs mt-1">error: expected ';' after struct definition</div>
+
+</div>
+
+<div v-click="1" class="p-3 rounded-lg bg-red-500/15 border-2 border-red-500 text-sm">
+<div class="text-xs uppercase opacity-60">L'errore</div>
+
+Manca il `;` dopo la graffa che chiude la struct. A differenza delle funzioni, la definizione di una struct finisce **sempre** con `;`
+
+</div>
+
+<div v-click="2" class="p-3 rounded-lg bg-green-500/15 border-2 border-green-500 text-sm">
+<div class="text-xs uppercase opacity-60">La correzione</div>
+
+`};`
+
+</div>
+
+</div>
+</div>
+
+---
+
+# 🔍 Trova l'errore <span class="text-2xl opacity-50">struct · 2 / 6</span>
+
+<div class="grid grid-cols-2 gap-6 mt-2">
+<div>
+
+````md magic-move
+```cpp {all|4-5}
+int main()
+{
+    Punto a;
+    Punto.x = 3;
+    Punto.y = 4;
+```
+
+```cpp {4-5}
+int main()
+{
+    Punto a;
+    a.x = 3;
+    a.y = 4;
+```
+````
+
+</div>
+<div class="flex flex-col gap-3">
+
+<div class="p-3 rounded-lg border-2 border-gray-400">
+<div class="text-xs uppercase opacity-60">Indizio</div>
+
+Il programma **non compila**:
+
+<div class="font-mono text-xs mt-1">error: expected unqualified-id before '.' token</div>
+
+</div>
+
+<div v-click="1" class="p-3 rounded-lg bg-red-500/15 border-2 border-red-500 text-sm">
+<div class="text-xs uppercase opacity-60">L'errore</div>
+
+`Punto` è il **tipo**, lo stampo: non contiene valori. I campi esistono solo nelle **variabili** di tipo `Punto`, come `a`. Sarebbe come scrivere `float = 3;`
+
+</div>
+
+<div v-click="2" class="p-3 rounded-lg bg-green-500/15 border-2 border-green-500 text-sm">
+<div class="text-xs uppercase opacity-60">La correzione</div>
+
+Si usa il nome della variabile: `a.x = 3;`
+
+</div>
+
+</div>
+</div>
+
+---
+
+# 🔍 Trova l'errore <span class="text-2xl opacity-50">struct · 3 / 6</span>
+
+<div class="grid grid-cols-2 gap-6 mt-2">
+<div>
+
+````md magic-move
+```cpp {all|5}
+float distanza(Punto a, Punto b)
+{
+    float dx = b.x - a.x;
+    float dy = b.y - a.y;
+    return dx * dx + dy * dy;
+}
+```
+
+```cpp {5}
+float distanza(Punto a, Punto b)
+{
+    float dx = b.x - a.x;
+    float dy = b.y - a.y;
+    return sqrt(dx * dx + dy * dy);
+}
+```
+````
+
+</div>
+<div class="flex flex-col gap-3">
+
+<div class="p-3 rounded-lg border-2 border-gray-400">
+<div class="text-xs uppercase opacity-60">Indizio</div>
+
+La distanza tra $(0, 0)$ e $(3, 4)$ risulta **25** invece di 5
+
+</div>
+
+<div v-click="1" class="p-3 rounded-lg bg-red-500/15 border-2 border-red-500 text-sm">
+<div class="text-xs uppercase opacity-60">L'errore</div>
+
+$3 \cdot 3 + 4 \cdot 4 = 25$ è $d^2$, non $d$: manca la **radice quadrata** del teorema di Pitagora
+
+</div>
+
+<div v-click="2" class="p-3 rounded-lg bg-green-500/15 border-2 border-green-500 text-sm">
+<div class="text-xs uppercase opacity-60">La correzione</div>
+
+`return sqrt(dx * dx + dy * dy);` (con `#include <cmath>`)
+
+</div>
+
+</div>
+</div>
+
+---
+
+# 🔍 Trova l'errore <span class="text-2xl opacity-50">struct · 4 / 6</span>
+
+<div class="grid grid-cols-2 gap-6 mt-2">
+<div>
+
+````md magic-move
+```cpp {all|5}
+float distanza(Punto a, Punto b)
+{
+    float dx = b.x - a.x;
+    float dy = b.y - a.y;
+    return sqrt(dx^2 + dy^2);
+}
+```
+
+```cpp {5}
+float distanza(Punto a, Punto b)
+{
+    float dx = b.x - a.x;
+    float dy = b.y - a.y;
+    return sqrt(dx * dx + dy * dy);
+}
+```
+````
+
+</div>
+<div class="flex flex-col gap-3">
+
+<div class="p-3 rounded-lg border-2 border-gray-400">
+<div class="text-xs uppercase opacity-60">Indizio</div>
+
+Il programma **non compila**:
+
+<div class="font-mono text-xs mt-1">error: invalid operands of types 'float' and 'float' to binary 'operator^'</div>
+
+</div>
+
+<div v-click="1" class="p-3 rounded-lg bg-red-500/15 border-2 border-red-500 text-sm">
+<div class="text-xs uppercase opacity-60">L'errore</div>
+
+In C++ `^` **non** è l'elevamento a potenza: è un'operazione sui bit, che con i `float` non si può nemmeno usare
+
+</div>
+
+<div v-click="2" class="p-3 rounded-lg bg-green-500/15 border-2 border-green-500 text-sm">
+<div class="text-xs uppercase opacity-60">La correzione</div>
+
+Il quadrato si scrive `dx * dx` (oppure `pow(dx, 2)`, sempre da `<cmath>`)
+
+</div>
+
+</div>
+</div>
+
+---
+
+# 🔍 Trova l'errore <span class="text-2xl opacity-50">struct · 5 / 6</span>
+
+<div class="grid grid-cols-2 gap-6 mt-2">
+<div>
+
+````md magic-move
+```cpp {all|4-5}
+Punto puntoMedio(Punto a, Punto b)
+{
+    Punto m;
+    m.x = a.x + b.x / 2;
+    m.y = a.y + b.y / 2;
+    return m;
+}
+```
+
+```cpp {4-5}
+Punto puntoMedio(Punto a, Punto b)
+{
+    Punto m;
+    m.x = (a.x + b.x) / 2;
+    m.y = (a.y + b.y) / 2;
+    return m;
+}
+```
+````
+
+</div>
+<div class="flex flex-col gap-3">
+
+<div class="p-3 rounded-lg border-2 border-gray-400">
+<div class="text-xs uppercase opacity-60">Indizio</div>
+
+Il punto medio tra $(2, 4)$ e $(6, 8)$ risulta $(5, 8)$ invece di $(4, 6)$
+
+</div>
+
+<div v-click="1" class="p-3 rounded-lg bg-red-500/15 border-2 border-red-500 text-sm">
+<div class="text-xs uppercase opacity-60">L'errore</div>
+
+Come in matematica, la divisione si fa **prima** della somma: viene diviso solo `b.x`. Infatti $2 + 6 / 2 = 5$ e $4 + 8 / 2 = 8$
+
+</div>
+
+<div v-click="2" class="p-3 rounded-lg bg-green-500/15 border-2 border-green-500 text-sm">
+<div class="text-xs uppercase opacity-60">La correzione</div>
+
+Le parentesi: `m.x = (a.x + b.x) / 2;`
+
+</div>
+
+</div>
+</div>
+
+---
+
+# 🔍 Trova l'errore <span class="text-2xl opacity-50">struct · 6 / 6</span>
+
+<div class="grid grid-cols-2 gap-6 mt-2">
+<div>
+
+````md magic-move
+```cpp {all|4}
+cin >> a.x >> a.y;
+cin >> b.x >> b.y;
+
+if (a == b)
+{
+    cout << "I punti coincidono" << endl;
+}
+```
+
+```cpp {4}
+cin >> a.x >> a.y;
+cin >> b.x >> b.y;
+
+if (a.x == b.x && a.y == b.y)
+{
+    cout << "I punti coincidono" << endl;
+}
+```
+````
+
+</div>
+<div class="flex flex-col gap-3">
+
+<div class="p-3 rounded-lg border-2 border-gray-400">
+<div class="text-xs uppercase opacity-60">Indizio</div>
+
+Il programma **non compila**:
+
+<div class="font-mono text-xs mt-1">error: no match for 'operator==' (operand types are 'Punto' and 'Punto')</div>
+
+</div>
+
+<div v-click="1" class="p-3 rounded-lg bg-red-500/15 border-2 border-red-500 text-sm">
+<div class="text-xs uppercase opacity-60">L'errore</div>
+
+Il C++ non sa confrontare due struct con `==`: non sa che due punti sono uguali quando hanno uguali **tutti** i campi
+
+</div>
+
+<div v-click="2" class="p-3 rounded-lg bg-green-500/15 border-2 border-green-500 text-sm">
+<div class="text-xs uppercase opacity-60">La correzione</div>
+
+Si confronta **campo per campo**: `a.x == b.x && a.y == b.y`
+
+</div>
+
+</div>
+</div>
+
+---
+
+# Prima di consegnare: la checklist delle struct
+
+<div class="text-lg mt-2 opacity-80">Quando usi una struct nel compito, controlla:</div>
+
+<v-clicks>
+
+- ✅ Dopo la graffa della struct c'è il **`;`**: `};`
+- ✅ La struct è definita **prima** delle funzioni che la usano
+- ✅ I campi si usano sulla **variabile** (`a.x`), mai sul tipo (`Punto.x`)
+- ✅ Il quadrato si scrive `dx * dx`: **`^` non è la potenza**
+- ✅ Per `sqrt` serve `#include <cmath>`
+- ✅ Le **parentesi** nella media: `(a.x + b.x) / 2`
+- ✅ Due struct si confrontano **campo per campo**, non con `==`
+- ✅ Una funzione che restituisce un punto ha tipo **`Punto`**, non `float`
+
+</v-clicks>
+
+---
+
+# Riepilogo: le struct
+
+<div class="grid grid-cols-2 gap-4 mt-4">
+
+<div v-click class="border-2 border-blue-500 rounded-lg p-4">
+  <div class="text-xs uppercase opacity-60">Definire</div>
+  <div class="font-bold text-lg mb-2">Un nuovo tipo</div>
+  <div class="text-sm">Raggruppa dati che stanno insieme</div>
+  <div class="font-mono text-sm mt-3">struct Punto { float x; float y; };</div>
+</div>
+
+<div v-click class="border-2 border-yellow-500 rounded-lg p-4">
+  <div class="text-xs uppercase opacity-60">Usare</div>
+  <div class="font-bold text-lg mb-2">Variabile e punto</div>
+  <div class="text-sm">Si dichiara come un tipo qualsiasi, i campi si raggiungono con il punto</div>
+  <div class="font-mono text-sm mt-3">Punto a; a.x = 1;</div>
+</div>
+
+<div v-click class="border-2 border-green-500 rounded-lg p-4">
+  <div class="text-xs uppercase opacity-60">Come parametro</div>
+  <div class="font-bold text-lg mb-2">Un parametro, tutti i dati</div>
+  <div class="text-sm">La funzione riceve il punto intero invece di due numeri sciolti</div>
+  <div class="font-mono text-sm mt-3">float distanza(Punto a, Punto b)</div>
+</div>
+
+<div v-click class="border-2 border-purple-500 rounded-lg p-4">
+  <div class="text-xs uppercase opacity-60">Come valore restituito</div>
+  <div class="font-bold text-lg mb-2">Più valori in un colpo solo</div>
+  <div class="text-sm">Una funzione restituisce un solo valore, ma quel valore può essere una struct</div>
+  <div class="font-mono text-sm mt-3">Punto puntoMedio(Punto a, Punto b)</div>
+</div>
+
+</div>
