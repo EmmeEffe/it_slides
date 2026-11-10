@@ -1,0 +1,6 @@
+/* Niente legature nel codice: "==" deve vedersi come due uguali, non come un segno solo */
+code,
+pre,
+.font-mono {
+  font-variant-ligatures: none;
+}
