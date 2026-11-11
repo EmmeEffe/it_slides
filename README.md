@@ -28,3 +28,8 @@ cl4/
 2. Nell'intestazione metti almeno `title:` (è il nome che compare nell'indice) e `routerMode: hash`
 3. Fai push su `main`: GitHub Actions la pubblica da sola, assieme al PDF
    (scaricabile dall'indice e dal pulsante di download nelle slide)
+
+## File da scaricare
+
+Metti i file (es. codice di partenza) in `cl<classe>/file/`, es. `cl4/file/frazioni.cpp`:
+vengono pubblicati così come sono e compaiono nell'indice sotto la classe, nella sezione "File".

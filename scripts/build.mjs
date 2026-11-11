@@ -1,9 +1,11 @@
 // Compila tutte le presentazioni (cartelle cl<N>/<argomento>/slides.md) in dist/,
 // esporta ciascuna anche in PDF e crea dist/index.html con l'elenco.
 // Con `npm run build -- --senza-pdf` salta l'esportazione PDF (più veloce in locale).
+// I file nella cartella cl<N>/file/ (es. codice da scaricare) vengono copiati così come sono
+// in dist/cl<N>/file/ e compaiono nell'indice sotto la classe.
 
 import { execFileSync } from 'node:child_process'
-import { existsSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { cpSync, existsSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 
 const radice = resolve(import.meta.dirname, '..')
@@ -20,6 +22,13 @@ const sottocartelle = dir => readdirSync(dir, { withFileTypes: true })
   .filter(d => d.isDirectory())
   .map(d => d.name)
   .sort()
+
+const fileIn = dir => existsSync(dir)
+  ? readdirSync(dir, { withFileTypes: true })
+      .filter(d => d.isFile() && !d.name.startsWith('.'))
+      .map(d => d.name)
+      .sort()
+  : []
 
 function titolo(file) {
   const intestazione = readFileSync(file, 'utf8').match(/^---\n([\s\S]*?)\n---/)
@@ -38,8 +47,9 @@ const classi = sottocartelle(radice)
         argomento,
         titolo: titolo(join(radice, classe, argomento, 'slides.md')) ?? argomento,
       })),
+    file: fileIn(join(radice, classe, 'file')),
   }))
-  .filter(c => c.presentazioni.length > 0)
+  .filter(c => c.presentazioni.length > 0 || c.file.length > 0)
 
 rmSync(dist, { recursive: true, force: true })
 
@@ -61,12 +71,21 @@ for (const { presentazioni } of classi) {
   }
 }
 
-const sezioni = classi.map(({ classe, presentazioni }) => `
+for (const { classe, file } of classi) {
+  if (file.length > 0)
+    cpSync(join(radice, classe, 'file'), join(dist, classe, 'file'), { recursive: true })
+}
+
+const sezioni = classi.map(({ classe, presentazioni, file }) => `
     <section>
-      <h2>Classe ${classe.slice(2)}ª</h2>
+      <h2>Classe ${classe.slice(2)}ª</h2>${presentazioni.length > 0 ? `
       <ul>
 ${presentazioni.map(p => `        <li><a href="${p.cartella}/">${p.titolo}</a>${conPdf ? ` <a class="pdf" href="${p.cartella}/${filePdf}" download="${p.argomento}.pdf">PDF</a>` : ''}</li>`).join('\n')}
-      </ul>
+      </ul>` : ''}${file.length > 0 ? `
+      <h3>File</h3>
+      <ul>
+${file.map(nome => `        <li><a href="${classe}/file/${encodeURIComponent(nome)}" download>${nome}</a></li>`).join('\n')}
+      </ul>` : ''}
     </section>`).join('\n')
 
 writeFileSync(join(dist, 'index.html'), `<!doctype html>
@@ -84,6 +103,7 @@ writeFileSync(join(dist, 'index.html'), `<!doctype html>
     main { max-width: 40rem; margin: 0 auto; padding: 3rem 1rem; }
     h1 { margin: 0 0 2rem; }
     h2 { font-size: 1.1rem; border-bottom: 1px solid var(--bordo); padding-bottom: 0.3rem; }
+    h3 { font-size: 0.95rem; margin: 1rem 0 0; opacity: 0.8; }
     ul { padding-left: 1.2rem; }
     a { color: var(--link); text-decoration: none; }
     a:hover { text-decoration: underline; }
