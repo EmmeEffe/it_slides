@@ -1601,3 +1601,1220 @@ Si confronta **campo per campo**: `a.x == b.x && a.y == b.y`
 </div>
 
 </div>
+
+---
+layout: section
+---
+
+# Esercizio 3
+
+Le classi: il vertice della parabola
+
+---
+
+# Esercizio 3
+
+<div class="text-xl leading-relaxed mt-6 border-l-4 border-blue-500 pl-6">
+
+Scrivi una classe **Parabola** che rappresenti la parabola $y = ax^2 + bx + c$:
+
+- i coefficienti `a`, `b` e `c` sono attributi **private**, che si impostano con dei **setter**
+- il metodo `calcolaVertice` restituisce il **vertice** della parabola, usando la `struct` **Punto**
+
+Nel `main` leggi da tastiera i tre coefficienti (`a` deve essere diverso da 0) e stampa il vertice.
+
+</div>
+
+<div class="mt-8 text-center text-xl border-2 border-yellow-500 rounded-lg p-4 bg-yellow-500/10">
+
+✋ Fermati qui e prova a scriverlo da solo prima di andare avanti
+
+</div>
+
+---
+
+# L'idea: il vertice della parabola
+
+<div class="grid grid-cols-[2fr_3fr] gap-8 mt-2">
+<div>
+
+<div class="text-center font-mono text-sm opacity-80">y = x² − 4x + 3</div>
+
+<svg viewBox="0 0 230 230" class="w-full">
+  <line x1="22" y1="160" x2="205" y2="160" stroke="currentColor" stroke-opacity="0.6" />
+  <line x1="58" y1="222" x2="58" y2="10" stroke="currentColor" stroke-opacity="0.6" />
+  <text x="202" y="153" text-anchor="end" fill="currentColor" fill-opacity="0.6" style="font-size: 11px; font-style: italic">x</text>
+  <text x="64" y="20" fill="currentColor" fill-opacity="0.6" style="font-size: 11px; font-style: italic">y</text>
+  <path d="M 49.6 39.9 Q 114 336.1 178.4 39.9" fill="none" stroke="#3b82f6" stroke-width="2.5" />
+  <line x1="114" y1="188" x2="114" y2="160" stroke="#eab308" stroke-width="1.5" stroke-dasharray="4 3" />
+  <line x1="114" y1="188" x2="58" y2="188" stroke="#eab308" stroke-width="1.5" stroke-dasharray="4 3" />
+  <text x="114" y="153" text-anchor="middle" fill="#ca8a04" style="font-size: 11px">2</text>
+  <text x="53" y="192" text-anchor="end" fill="#ca8a04" style="font-size: 11px">−1</text>
+  <circle cx="114" cy="188" r="6" fill="#22c55e" />
+  <text x="124" y="208" fill="#16a34a" style="font-size: 13px; font-weight: bold">V (2, −1)</text>
+</svg>
+
+</div>
+<div>
+
+<div v-click="1">
+
+Il **vertice** è il punto più basso (o più alto) della parabola:
+
+$$
+x_V = -\frac{b}{2a} \qquad \Delta = b^2 - 4ac \qquad y_V = -\frac{\Delta}{4a}
+$$
+
+</div>
+
+<div v-click="2" class="mt-2">
+
+Nell'esempio $a = 1$, $b = -4$, $c = 3$:
+
+$$
+x_V = -\frac{-4}{2} = 2 \qquad \Delta = 16 - 12 = 4 \qquad y_V = -\frac{4}{4} = -1
+$$
+
+</div>
+
+<div v-click="3" class="mt-4 p-3 rounded-lg bg-yellow-500/15 border-2 border-yellow-500 text-sm">
+
+**Perché $a \neq 0$?** Con $a = 0$ non è più una parabola ma una retta, e nelle formule si dividerebbe per 0
+
+</div>
+
+<div v-click="4" class="mt-4">
+
+Il vertice sono **due** numeri, $x_V$ e $y_V$, che stanno insieme: è un **punto**. Ci tornerà utile la `struct Punto` dell'esercizio 2
+
+</div>
+
+</div>
+</div>
+
+---
+
+# Passo 1: tutto nel `main`
+
+<div class="grid grid-cols-2 gap-8">
+<div>
+
+```cpp {all|4-7|8-11|12-14|15-16|all} {at:1}
+int main(){
+    float a, b, c, delta;
+    float xv, yv;
+    do{
+        cout << "Inserisci a (diverso da 0): ";
+        cin >> a;
+    }while(a==0);
+    cout << "Inserisci b: ";
+    cin >> b;
+    cout << "Inserisci c: ";
+    cin >> c;
+    xv = -b/(2*a);
+    delta = b*b-4*a*c;
+    yv = -delta/(4*a);
+    cout << "Il vertice è al punto ("
+         << xv << ";" << yv << ")" << endl;
+    return 0;
+}
+```
+
+</div>
+<div class="flex flex-col gap-3 compatto">
+
+<div class="border-l-4 border-gray-400 pl-4">
+
+Prima della classe, scriviamo il programma **come lo sapremmo già fare**
+
+</div>
+
+<div v-click="1" class="border-l-4 border-yellow-500 pl-4">
+
+Il **`do-while`** richiede `a` finché l'utente non scrive un valore diverso da 0
+
+</div>
+
+<div v-click="2" class="border-l-4 border-blue-500 pl-4">
+
+Poi `b` e `c`: va bene qualsiasi valore
+
+</div>
+
+<div v-click="3" class="border-l-4 border-green-500 pl-4">
+
+Le formule del vertice. Attenzione alle **parentesi**: `-b/(2*a)`, non `-b/2*a`
+
+</div>
+
+<div v-click="4" class="border-l-4 border-gray-400 pl-4">
+
+Stampiamo il risultato
+
+</div>
+
+<div v-click="5" class="p-3 rounded-lg bg-yellow-500/15 border-2 border-yellow-500 text-sm">
+
+Funziona! Ma **dati** e **calcoli** della parabola sono mescolati con il dialogo con l'utente: li raccogliamo in una **classe**
+
+</div>
+
+</div>
+</div>
+
+---
+
+# Dal `main` alla classe: cosa va dove?
+
+<div class="grid grid-cols-2 gap-8">
+<div>
+
+```cpp {all|2|12-14|3-11,15-16|all} {at:1}
+int main(){
+    float a, b, c, delta;
+    float xv, yv;
+    do{
+        cout << "Inserisci a (diverso da 0): ";
+        cin >> a;
+    }while(a==0);
+    cout << "Inserisci b: ";
+    cin >> b;
+    cout << "Inserisci c: ";
+    cin >> c;
+    xv = -b/(2*a);
+    delta = b*b-4*a*c;
+    yv = -delta/(4*a);
+    cout << "Il vertice è al punto ("
+         << xv << ";" << yv << ")" << endl;
+    return 0;
+}
+```
+
+</div>
+<div class="flex flex-col gap-4">
+
+<div v-click="1" class="border-2 border-purple-500 rounded-lg p-3">
+  <div class="text-xs uppercase opacity-60">Va nella classe</div>
+  I <b>dati</b> della parabola, <code>a</code>, <code>b</code>, <code>c</code> e <code>delta</code>, diventano <b>attributi</b>
+</div>
+
+<div v-click="2" class="border-2 border-purple-500 rounded-lg p-3">
+  <div class="text-xs uppercase opacity-60">Va nella classe</div>
+  Il <b>calcolo</b> del vertice diventa un <b>metodo</b>
+</div>
+
+<div v-click="3" class="border-2 border-gray-400 rounded-lg p-3">
+  <div class="text-xs uppercase opacity-60">Resta nel main</div>
+  Il <b>dialogo con l'utente</b>: <code>cout</code>, <code>cin</code>, il controllo su <code>a</code> e le variabili dove salvare il risultato
+</div>
+
+<div v-click="4" class="text-center text-lg mt-2">
+
+La classe sa **cos'è** una parabola e **come** si calcola il vertice. Il `main` **parla con l'utente**
+
+</div>
+
+</div>
+</div>
+
+---
+
+# Passo 2: la prima classe
+
+<div class="grid grid-cols-2 gap-6">
+<div>
+
+```cpp {all|3|5-11|5-11|all|all} {at:1}
+class Parabola{
+public:
+    float a, b, c, delta;
+
+    float getVerticeX(){
+        return -b/(2*a);
+    }
+    float getVerticeY(){
+        delta = b*b-4*a*c;
+        return -delta/(4*a);
+    }
+};
+```
+
+</div>
+<div>
+
+```cpp {all|all|all|all|2|6,9,11|12-15} {at:1}
+int main(){
+    Parabola p;
+    float xv, yv;
+    do{
+        cout << "Inserisci a (diverso da 0): ";
+        cin >> p.a;
+    }while(p.a==0);
+    cout << "Inserisci b: ";
+    cin >> p.b;
+    cout << "Inserisci c: ";
+    cin >> p.c;
+    xv = p.getVerticeX();
+    yv = p.getVerticeY();
+    cout << "Il vertice è al punto ("
+         << xv << ";" << yv << ")" << endl;
+    return 0;
+}
+```
+
+</div>
+</div>
+
+<div class="mt-2">
+<div v-if="$clicks === 0">La prima versione: per ora tutti gli attributi sono <code>public</code></div>
+<div v-if="$clicks === 1">I dati della parabola sono diventati <b>attributi</b></div>
+<div v-if="$clicks === 2">Il calcolo è diventato un metodo... anzi <b>due</b>: <code>getVerticeX</code> e <code>getVerticeY</code></div>
+<div v-if="$clicks === 3">Perché due? Un metodo, come ogni funzione, restituisce <b>un solo valore</b>: uno per la x e uno per la y</div>
+<div v-if="$clicks === 4">Nel <code>main</code> creiamo l'oggetto <code>p</code>, la nostra parabola</div>
+<div v-if="$clicks === 5">Il <code>cin</code> scrive direttamente negli attributi: si può, perché sono <code>public</code></div>
+<div v-if="$clicks === 6">Per avere il vertice servono <b>due chiamate</b>, e il <code>main</code> deve rimettere insieme x e y</div>
+</div>
+
+<!--
+Il passaggio è lo stesso del rettangolo: dati → attributi, calcoli → metodi.
+Il main legge ancora direttamente negli attributi: lo sistemeremo con i setter al passo 4.
+-->
+
+---
+
+# Passo 3: da due metodi a un `Punto`
+
+<div class="grid grid-cols-2 gap-6" style="--slidev-code-font-size: 11px; --slidev-code-line-height: 16px">
+<div>
+
+````md magic-move {at:2}
+```cpp
+class Parabola{
+public:
+    float a, b, c, delta;
+
+    float getVerticeX(){
+        return -b/(2*a);
+    }
+    float getVerticeY(){
+        delta = b*b-4*a*c;
+        return -delta/(4*a);
+    }
+};
+```
+
+```cpp
+struct Punto{
+    float x;
+    float y;
+};
+
+class Parabola{
+public:
+    float a, b, c, delta;
+
+    float getVerticeX(){
+        return -b/(2*a);
+    }
+    float getVerticeY(){
+        delta = b*b-4*a*c;
+        return -delta/(4*a);
+    }
+};
+```
+
+```cpp
+struct Punto{
+    float x;
+    float y;
+};
+
+class Parabola{
+public:
+    float a, b, c, delta;
+    Punto vertice;
+
+    Punto calcolaVertice(){
+        vertice.x = -b/(2*a);
+        delta = b*b-4*a*c;
+        vertice.y = -delta/(4*a);
+        return vertice;
+    }
+};
+```
+````
+
+</div>
+<div class="flex flex-col gap-3 compatto">
+
+````md magic-move {at:4}
+```cpp
+// ... lettura di a, b e c ...
+float xv, yv;
+xv = p.getVerticeX();
+yv = p.getVerticeY();
+cout << "Il vertice è al punto ("
+     << xv << ";" << yv << ")" << endl;
+```
+
+```cpp
+// ... lettura di a, b e c ...
+Punto vertice_calcolato;
+vertice_calcolato = p.calcolaVertice();
+cout << "Il vertice è al punto ("
+     << vertice_calcolato.x << ";"
+     << vertice_calcolato.y << ")" << endl;
+```
+````
+
+<div v-click="1" class="p-3 rounded-lg bg-red-500/15 border-2 border-red-500 text-sm">
+<div class="text-xs uppercase opacity-60">Il problema</div>
+
+Il vertice è **un** punto, ma esce in **due pezzi**: due metodi e due chiamate
+
+</div>
+
+<div v-click="2" class="border-l-4 border-blue-500 pl-4 text-sm">
+
+La `struct Punto` dell'esercizio 2 tiene x e y **insieme**. Va scritta **prima** della classe
+
+</div>
+
+<div v-click="3" class="border-l-4 border-green-500 pl-4 text-sm">
+
+Un solo metodo che restituisce un **`Punto`**. Anche il vertice diventa un attributo
+
+</div>
+
+<div v-click="4" class="border-l-4 border-yellow-500 pl-4 text-sm">
+
+Nel `main` una sola chiamata. Come `puntoMedio`: si restituisce un solo valore, ma è una **struct**
+
+</div>
+
+</div>
+</div>
+
+<!--
+Domanda alla classe prima di andare avanti: cosa non vi piace di getVerticeX / getVerticeY?
+Collegare a puntoMedio dell'esercizio 2: stesso problema (due valori da restituire), stessa soluzione.
+-->
+
+---
+
+# Passo 4: perché i setter?
+
+<div class="grid grid-cols-2 gap-8">
+<div>
+
+```cpp {all|3-4|all} {at:1}
+class Parabola{
+public:
+    float a, b, c, delta;
+    Punto vertice;
+
+    Punto calcolaVertice(){
+        vertice.x = -b/(2*a);
+        delta = b*b-4*a*c;
+        vertice.y = -delta/(4*a);
+        return vertice;
+    }
+};
+```
+
+<div v-click="1" class="mt-4">
+
+```cpp
+// nel main, dopo il do-while...
+p.a = 0;        // divisione per 0!
+p.delta = 100;  // delta lo calcola la classe
+```
+
+</div>
+
+</div>
+<div class="flex flex-col gap-3 compatto">
+
+<div v-click="1" class="border-l-4 border-red-500 pl-4">
+
+Con gli attributi `public`, il `main` può scrivere **qualsiasi valore** in **qualsiasi** attributo
+
+</div>
+
+<div v-click="2" class="border-l-4 border-purple-500 pl-4">
+
+Come per il rettangolo, gli attributi diventano **`private`**. Ma ora `cin >> p.a;` non compila più:
+
+<div class="font-mono text-red-500" style="font-size: 10px">error: 'float Parabola::a' is private within this context</div>
+
+</div>
+
+<div v-click="3" class="border-l-4 border-green-500 pl-4">
+
+Serve una **porta controllata**: un **setter** per `a`, `b` e `c`. Per `delta` e `vertice` **nessun setter**: li calcola solo la classe
+
+</div>
+
+<div v-click="4" class="p-3 rounded-lg border-2 border-gray-400 text-sm">
+
+💡 Il setter è anche il posto giusto per un **controllo** (come `setBase` nel rettangolo): `setA` potrebbe rifiutare `a = 0`
+
+</div>
+
+</div>
+</div>
+
+<!--
+Il motivo dei setter: con gli attributi private il main non può più scriverci, quindi la classe apre una "porta" solo per i coefficienti.
+delta e vertice restano chiusi: sono il risultato dei calcoli della classe.
+Nel programma fatto a lezione il controllo a != 0 è nel main (do-while); spostarlo in setA è un'alternativa.
+-->
+
+---
+
+# Passo 4: attributi `private` e setter
+
+<div class="grid grid-cols-2 gap-4" style="--slidev-code-font-size: 11px; --slidev-code-line-height: 16px">
+<div>
+
+````md magic-move {at:1}
+```cpp
+class Parabola{
+public:
+    float a, b, c, delta;
+    Punto vertice;
+
+    Punto calcolaVertice(){
+        vertice.x = -b/(2*a);
+        delta = b*b-4*a*c;
+        vertice.y = -delta/(4*a);
+        return vertice;
+    }
+};
+```
+
+```cpp
+class Parabola{
+private:
+    float a, b, c, delta;
+    Punto vertice;
+public:
+    Punto calcolaVertice(){
+        vertice.x = -b/(2*a);
+        delta = b*b-4*a*c;
+        vertice.y = -delta/(4*a);
+        return vertice;
+    }
+};
+```
+
+```cpp
+class Parabola{
+private:
+    float a, b, c, delta;
+    Punto vertice;
+public:
+    void setA(float val_a){
+        a = val_a;
+    }
+    void setB(float val_b){
+        b = val_b;
+    }
+    void setC(float val_c){
+        c = val_c;
+    }
+
+    Punto calcolaVertice(){
+        vertice.x = -b/(2*a);
+        delta = b*b-4*a*c;
+        vertice.y = -delta/(4*a);
+        return vertice;
+    }
+};
+```
+````
+
+</div>
+<div>
+
+````md magic-move {at:3}
+```cpp
+int main(){
+    Parabola p;
+    Punto vertice_calcolato;
+    do{
+        cout << "Inserisci a (diverso da 0): ";
+        cin >> p.a;
+    }while(p.a==0);
+    cout << "Inserisci b: ";
+    cin >> p.b;
+    cout << "Inserisci c: ";
+    cin >> p.c;
+    vertice_calcolato = p.calcolaVertice();
+    // ... stampa ...
+    return 0;
+}
+```
+
+```cpp {all|3|5-9|10-15}
+int main(){
+    Parabola p;
+    float a_utente, b_utente, c_utente;
+    Punto vertice_calcolato;
+    do{
+        cout << "Inserisci a (diverso da 0): ";
+        cin >> a_utente;
+    }while(a_utente==0);
+    p.setA(a_utente);
+    cout << "Inserisci b: ";
+    cin >> b_utente;
+    p.setB(b_utente);
+    cout << "Inserisci c: ";
+    cin >> c_utente;
+    p.setC(c_utente);
+    vertice_calcolato = p.calcolaVertice();
+    // ... stampa ...
+    return 0;
+}
+```
+````
+
+</div>
+</div>
+
+<div class="mt-2 text-sm">
+<div v-if="$clicks === 0">Partiamo dalla classe del passo 3, con gli attributi <code>public</code></div>
+<div v-if="$clicks === 1">Tutti gli attributi diventano <code>private</code>, anche <code>delta</code> e <code>vertice</code>. Il metodo resta <code>public</code></div>
+<div v-if="$clicks === 2">Un setter per ogni coefficiente: riceve il nuovo valore e lo copia nell'attributo. Per <code>delta</code> e <code>vertice</code> niente setter</div>
+<div v-if="$clicks === 3">Il <code>main</code> non può più scrivere in <code>p.a</code>: deve passare dai setter</div>
+<div v-if="$clicks === 4">Servono tre variabili <b>del main</b> dove leggere i valori scritti dall'utente</div>
+<div v-if="$clicks === 5">Il <code>do-while</code> controlla <code>a_utente</code>; quando va bene, lo passiamo a <code>setA</code></div>
+<div v-if="$clicks === 6">Stessa cosa per <code>b</code> e <code>c</code>, senza controllo</div>
+</div>
+
+---
+
+# Come funziona un setter
+
+<div class="grid grid-cols-[2fr_3fr] gap-8 mt-2">
+<div>
+
+```cpp {2|3,6|7|8}
+// nel main
+cin >> a_utente;      // l'utente scrive 2
+p.setA(a_utente);
+
+// nella classe
+void setA(float val_a){
+    a = val_a;
+}
+```
+
+</div>
+<div>
+
+<div class="grid grid-cols-[1fr_auto_1fr_auto_1fr] items-center gap-2 font-mono text-sm">
+
+<div class="border-2 border-gray-400 rounded-lg p-2">
+  <div class="text-xs opacity-60 font-sans">main</div>
+  <div>a_utente = <b>2</b></div>
+</div>
+
+<div class="text-center text-xs font-sans" :class="$clicks === 1 ? 'text-blue-500' : 'opacity-0'">copia<br>⟶</div>
+
+<div class="border-2 rounded-lg p-2" :class="$clicks === 0 ? 'opacity-0' : $clicks === 3 ? 'border-dashed border-gray-400 opacity-40' : 'border-blue-500'">
+  <div class="text-xs opacity-60 font-sans">setA</div>
+  <div :class="{ 'line-through': $clicks === 3 }">val_a = <b>2</b></div>
+</div>
+
+<div class="text-center text-xs font-sans" :class="$clicks === 2 ? 'text-green-500' : 'opacity-0'">copia<br>⟶</div>
+
+<div class="border-2 border-purple-500 rounded-lg p-2">
+  <div class="text-xs opacity-60 font-sans">Parabola p 🔒</div>
+  <div>a = <b :class="$clicks >= 2 ? 'text-green-500' : 'text-red-500'">{{ $clicks >= 2 ? '2' : '?' }}</b></div>
+  <div class="opacity-50">b = ?</div>
+  <div class="opacity-50">c = ?</div>
+</div>
+
+</div>
+
+<div class="mt-6">
+<div v-if="$clicks === 0">L'utente scrive 2 in <code>a_utente</code>, una variabile <b>del main</b>. L'attributo <code>a</code> di <code>p</code> contiene ancora un valore a caso</div>
+<div v-if="$clicks === 1">Chiamando <code>p.setA(a_utente)</code> nasce il parametro <code>val_a</code>, che riceve una <b>copia</b> del valore di <code>a_utente</code></div>
+<div v-if="$clicks === 2"><code>a = val_a;</code> copia il valore del parametro nell'<b>attributo</b> <code>a</code> dell'oggetto <code>p</code></div>
+<div v-if="$clicks === 3">Il setter finisce e <code>val_a</code> <b>sparisce</b>, come ogni parametro. Il valore però è salvo nell'attributo, che vive finché vive l'oggetto <code>p</code></div>
+</div>
+
+</div>
+</div>
+
+<div v-click="4" class="mt-6 grid grid-cols-3 gap-4 text-sm">
+  <div class="border-2 border-gray-400 rounded-lg p-3"><code>a_utente</code><br>variabile del <b>main</b>: dove l'utente scrive</div>
+  <div class="border-2 border-blue-500 rounded-lg p-3"><code>val_a</code><br><b>parametro</b>: esiste solo durante la chiamata</div>
+  <div class="border-2 border-purple-500 rounded-lg p-3"><code>a</code><br><b>attributo</b>: vive dentro l'oggetto, ed è <code>private</code></div>
+</div>
+
+<!--
+Tre variabili diverse per lo stesso numero: è il punto da far capire.
+Il valore fa due copie: a_utente → val_a (passaggio del parametro), val_a → a (assegnazione nel setter).
+-->
+
+---
+
+# Perché il parametro ha un nome diverso?
+
+<div class="grid grid-cols-2 gap-8 mt-2">
+<div class="border-2 border-red-500 rounded-lg p-4">
+<div class="text-xs uppercase opacity-60">❌ Stesso nome</div>
+
+<pre class="font-mono text-sm mt-2 leading-relaxed">void setA(float <span class="text-orange-500 font-bold">a</span>){
+    <span :class="$clicks >= 2 ? 'text-orange-500 font-bold' : ''">a</span> = <span :class="$clicks >= 2 ? 'text-orange-500 font-bold' : ''">a</span>;
+}</pre>
+
+<div v-click="1" class="flex gap-3 mt-3 font-mono text-sm">
+  <div class="border-2 border-purple-500 rounded p-2"><div class="text-xs font-sans opacity-60">attributo di p</div>a = <b class="text-red-500">?</b></div>
+  <div class="border-2 border-orange-500 rounded p-2"><div class="text-xs font-sans opacity-60">parametro</div>a = <b>2</b></div>
+</div>
+
+<div v-click="1" class="text-sm mt-2">Ci sono <b>due</b> variabili che si chiamano <code>a</code>. In <code>a = a;</code>, quale delle due?</div>
+
+<div v-click="2" class="text-sm mt-2">Dentro il metodo vince il nome <b>più vicino</b>: il parametro <b>nasconde</b> l'attributo. Entrambe le <code>a</code> sono il parametro, che viene copiato in sé stesso. L'attributo resta un valore a caso</div>
+
+<div v-click="3" class="text-sm mt-2 p-2 rounded bg-red-500/15">
+
+Compila **senza errori** e senza avvisi, ma con $a = 2$, $b = 4$, $c = 1$ stampa:<br>
+<span class="font-mono text-xs">Il vertice è al punto (25927.1;51855.2)</span>
+
+</div>
+
+</div>
+<div v-click="4" class="border-2 border-green-500 rounded-lg p-4">
+<div class="text-xs uppercase opacity-60">✅ Nomi diversi</div>
+
+<pre class="font-mono text-sm mt-2 leading-relaxed">void setA(float <span class="text-blue-500 font-bold">val_a</span>){
+    <span class="text-purple-500 font-bold">a</span> = <span class="text-blue-500 font-bold">val_a</span>;
+}</pre>
+
+<div class="flex gap-3 mt-3 font-mono text-sm">
+  <div class="border-2 border-purple-500 rounded p-2"><div class="text-xs font-sans opacity-60">attributo di p</div>a = <b class="text-green-500">2</b></div>
+  <div class="border-2 border-blue-500 rounded p-2"><div class="text-xs font-sans opacity-60">parametro</div>val_a = <b>2</b></div>
+</div>
+
+<div class="text-sm mt-2">Nessuna ambiguità: <code>a</code> può essere solo l'<b>attributo</b>, <code>val_a</code> solo il <b>parametro</b>. Il valore va da uno all'altro</div>
+
+<div class="text-sm mt-3 p-2 rounded bg-green-500/15">
+
+**Regola**: il parametro del setter ha un nome **diverso** dall'attributo, per esempio `val_a`, `val_b`, `val_c`
+
+</div>
+
+</div>
+</div>
+
+<!--
+Il risultato con a = a dipende da cosa c'è in memoria: numeri a caso, a ogni esecuzione possono cambiare.
+Il compilatore non segnala niente: è un errore "silenzioso", per questo è importante la regola dei nomi diversi.
+-->
+
+---
+zoom: 0.9
+---
+
+# Il programma completo
+
+<div class="grid grid-cols-2 gap-6" style="--slidev-code-font-size: 10px; --slidev-code-line-height: 14px">
+<div>
+
+```cpp {all|4-7|10-12|14-22|24-29|all|all|all} {at:1}
+#include <iostream>
+using namespace std;
+
+struct Punto{
+  float x;
+  float y;
+};
+
+class Parabola{
+private:
+  float a, b, c, delta;
+  Punto vertice;
+public:
+  void setA(float val_a){
+    a = val_a;
+  }
+  void setB(float val_b){
+    b = val_b;
+  }
+  void setC(float val_c){
+    c = val_c;
+  }
+
+  Punto calcolaVertice(){
+    vertice.x = -b/(2*a);
+    delta = b*b-4*a*c;
+    vertice.y = -delta/(4*a);
+    return vertice;
+  }
+};
+```
+
+</div>
+<div>
+
+```cpp {all|all|all|all|all|5-9|10-15|16-18} {at:1}
+int main(){
+  Parabola p;
+  float a_utente, b_utente, c_utente;
+  Punto vertice_calcolato;
+  do{
+    cout << "Inserisci a (diverso da 0): ";
+    cin >> a_utente;
+  }while(a_utente==0);
+  p.setA(a_utente);
+  cout << "Inserisci b: ";
+  cin >> b_utente;
+  p.setB(b_utente);
+  cout << "Inserisci c: ";
+  cin >> c_utente;
+  p.setC(c_utente);
+  vertice_calcolato = p.calcolaVertice();
+  cout << "Il vertice è al punto (" << vertice_calcolato.x
+       << ";" << vertice_calcolato.y << ")" << endl;
+  return 0;
+}
+```
+
+<div class="mt-3 text-sm">
+<div v-if="$clicks === 1">La <code>struct Punto</code> va definita <b>prima</b> della classe che la usa</div>
+<div v-if="$clicks === 2">Gli attributi sono <code>private</code>: il <code>main</code> non li vede</div>
+<div v-if="$clicks === 3">I setter sono <code>public</code>: sono la porta d'ingresso per <code>a</code>, <code>b</code> e <code>c</code></div>
+<div v-if="$clicks === 4"><code>calcolaVertice</code> usa gli attributi e restituisce il vertice come <code>Punto</code></div>
+<div v-if="$clicks === 5">Il controllo <code>a ≠ 0</code> lo fa il <code>main</code>, poi passa il valore al setter</div>
+<div v-if="$clicks === 6"><code>b</code> e <code>c</code>: si leggono e si passano ai setter</div>
+<div v-if="$clicks === 7">Una sola chiamata per il vertice, poi si stampano i campi <code>.x</code> e <code>.y</code></div>
+</div>
+
+</div>
+</div>
+
+---
+
+# Prova a cambiare la parabola
+
+<DemoParabola />
+
+<!--
+Provare: a negativo (parabola rivolta verso il basso), b = 0 (vertice sull'asse y), a = 0 (il do-while non chiama setA, l'oggetto non cambia).
+Far notare che delta e vertice cambiano solo perché li ricalcola la classe: nessuno li scrive dal main.
+-->
+
+---
+
+# 🔍 Trova l'errore: classi
+
+<div class="text-lg mt-6">
+
+Ultimo giro: **6 versioni** del programma della parabola, ognuna con **un errore**.
+
+</div>
+
+<div class="grid grid-cols-3 gap-6 mt-10">
+
+<div class="border-2 border-gray-400 rounded-lg p-4">
+  <div class="text-3xl mb-2">🕵️</div>
+  <div class="font-bold mb-1">1. Leggi l'indizio</div>
+  <div class="text-sm">Un errore di compilazione o un risultato sbagliato</div>
+</div>
+
+<div class="border-2 border-yellow-500 rounded-lg p-4">
+  <div class="text-3xl mb-2">👉</div>
+  <div class="font-bold mb-1">2. Trova la riga</div>
+  <div class="text-sm">Cerca la riga sbagliata e prova a spiegare <b>perché</b> causa quel problema</div>
+</div>
+
+<div class="border-2 border-green-500 rounded-lg p-4">
+  <div class="text-3xl mb-2">✅</div>
+  <div class="font-bold mb-1">3. Vai avanti</div>
+  <div class="text-sm">Al primo passo si evidenzia l'errore, al secondo compare la correzione</div>
+</div>
+
+</div>
+
+---
+
+# 🔍 Trova l'errore <span class="text-2xl opacity-50">classi · 1 / 6</span>
+
+<div class="grid grid-cols-2 gap-6 mt-2">
+<div>
+
+````md magic-move
+```cpp {all|2}
+Punto calcolaVertice(){
+    vertice.x = -b/2*a;
+    delta = b*b-4*a*c;
+    vertice.y = -delta/(4*a);
+    return vertice;
+}
+```
+
+```cpp {2}
+Punto calcolaVertice(){
+    vertice.x = -b/(2*a);
+    delta = b*b-4*a*c;
+    vertice.y = -delta/(4*a);
+    return vertice;
+}
+```
+````
+
+</div>
+<div class="flex flex-col gap-3">
+
+<div class="p-3 rounded-lg border-2 border-gray-400">
+<div class="text-xs uppercase opacity-60">Indizio</div>
+
+Con $a = 2$, $b = 4$, $c = 1$ il vertice risulta $(-4; -1)$ invece di $(-1; -1)$: la y è giusta, la x no
+
+</div>
+
+<div v-click="1" class="p-3 rounded-lg bg-red-500/15 border-2 border-red-500 text-sm">
+<div class="text-xs uppercase opacity-60">L'errore</div>
+
+Divisione e moltiplicazione si eseguono **da sinistra a destra**: `-b/2*a` divide per 2 e poi **moltiplica** per `a`. Infatti $-4 / 2 \cdot 2 = -4$
+
+</div>
+
+<div v-click="2" class="p-3 rounded-lg bg-green-500/15 border-2 border-green-500 text-sm">
+<div class="text-xs uppercase opacity-60">La correzione</div>
+
+Le parentesi intorno al denominatore: `-b/(2*a)`
+
+</div>
+
+</div>
+</div>
+
+---
+
+# 🔍 Trova l'errore <span class="text-2xl opacity-50">classi · 2 / 6</span>
+
+<div class="grid grid-cols-2 gap-6 mt-2">
+<div>
+
+````md magic-move
+```cpp {all|3-4}
+Punto calcolaVertice(){
+    vertice.x = -b/(2*a);
+    vertice.y = -delta/(4*a);
+    delta = b*b-4*a*c;
+    return vertice;
+}
+```
+
+```cpp {3-4}
+Punto calcolaVertice(){
+    vertice.x = -b/(2*a);
+    delta = b*b-4*a*c;
+    vertice.y = -delta/(4*a);
+    return vertice;
+}
+```
+````
+
+</div>
+<div class="flex flex-col gap-3 compatto">
+
+<div class="p-3 rounded-lg border-2 border-gray-400">
+<div class="text-xs uppercase opacity-60">Indizio</div>
+
+Con $a = 2$, $b = 4$, $c = 1$ stampa:
+
+<div class="font-mono text-xs mt-1">Il vertice è al punto (-1;-5.73692e-42)</div>
+
+La x è giusta, ma la y è un numero strano invece di −1
+
+</div>
+
+<div v-click="1" class="p-3 rounded-lg bg-red-500/15 border-2 border-red-500 text-sm">
+<div class="text-xs uppercase opacity-60">L'errore</div>
+
+`vertice.y` usa `delta` **prima** che venga calcolato: in quel momento `delta` contiene un valore a caso. Le istruzioni si eseguono **nell'ordine** in cui sono scritte
+
+</div>
+
+<div v-click="2" class="p-3 rounded-lg bg-green-500/15 border-2 border-green-500 text-sm">
+<div class="text-xs uppercase opacity-60">La correzione</div>
+
+Prima si calcola `delta`, poi lo si usa per `vertice.y`
+
+</div>
+
+</div>
+</div>
+
+---
+
+# 🔍 Trova l'errore <span class="text-2xl opacity-50">classi · 3 / 6</span>
+
+<div class="grid grid-cols-2 gap-6 mt-2">
+<div>
+
+````md magic-move
+```cpp {all|5,6}
+int main(){
+    Parabola p;
+    do{
+        cout << "Inserisci a (diverso da 0): ";
+        cin >> p.a;
+    }while(p.a==0);
+```
+
+```cpp {5-7}
+int main(){
+    Parabola p;
+    do{
+        cout << "Inserisci a (diverso da 0): ";
+        cin >> a_utente;
+    }while(a_utente==0);
+    p.setA(a_utente);
+```
+````
+
+</div>
+<div class="flex flex-col gap-3">
+
+<div class="p-3 rounded-lg border-2 border-gray-400">
+<div class="text-xs uppercase opacity-60">Indizio</div>
+
+Il programma **non compila**:
+
+<div class="font-mono text-xs mt-1">error: 'float Parabola::a' is private within this context</div>
+
+</div>
+
+<div v-click="1" class="p-3 rounded-lg bg-red-500/15 border-2 border-red-500 text-sm">
+<div class="text-xs uppercase opacity-60">L'errore</div>
+
+`a` è `private`: dal `main` non si può né scrivere né leggere, nemmeno con `cin` o nella condizione del `while`
+
+</div>
+
+<div v-click="2" class="p-3 rounded-lg bg-green-500/15 border-2 border-green-500 text-sm">
+<div class="text-xs uppercase opacity-60">La correzione</div>
+
+Si legge in una variabile del `main`, la si controlla, e la si passa al **setter**: `p.setA(a_utente);`
+
+</div>
+
+</div>
+</div>
+
+---
+
+# 🔍 Trova l'errore <span class="text-2xl opacity-50">classi · 4 / 6</span>
+
+<div class="grid grid-cols-2 gap-6 mt-2">
+<div>
+
+````md magic-move
+```cpp {all|1}
+float calcolaVertice(){
+    vertice.x = -b/(2*a);
+    delta = b*b-4*a*c;
+    vertice.y = -delta/(4*a);
+    return vertice;
+}
+```
+
+```cpp {1}
+Punto calcolaVertice(){
+    vertice.x = -b/(2*a);
+    delta = b*b-4*a*c;
+    vertice.y = -delta/(4*a);
+    return vertice;
+}
+```
+````
+
+</div>
+<div class="flex flex-col gap-3">
+
+<div class="p-3 rounded-lg border-2 border-gray-400">
+<div class="text-xs uppercase opacity-60">Indizio</div>
+
+Il programma **non compila**:
+
+<div class="font-mono text-xs mt-1">error: cannot convert 'Punto' to 'float' in return</div>
+
+</div>
+
+<div v-click="1" class="p-3 rounded-lg bg-red-500/15 border-2 border-red-500 text-sm">
+<div class="text-xs uppercase opacity-60">L'errore</div>
+
+Il metodo dice di restituire un `float`, ma `return vertice;` restituisce un `Punto`: un punto non si può trasformare in un numero solo
+
+</div>
+
+<div v-click="2" class="p-3 rounded-lg bg-green-500/15 border-2 border-green-500 text-sm">
+<div class="text-xs uppercase opacity-60">La correzione</div>
+
+Il tipo restituito è quello di ciò che si restituisce: `Punto calcolaVertice()`
+
+</div>
+
+</div>
+</div>
+
+---
+
+# 🔍 Trova l'errore <span class="text-2xl opacity-50">classi · 5 / 6</span>
+
+<div class="grid grid-cols-2 gap-6 mt-2">
+<div>
+
+````md magic-move
+```cpp {all|2}
+vertice_calcolato = p.calcolaVertice();
+cout << vertice_calcolato << endl;
+```
+
+```cpp {2-4}
+vertice_calcolato = p.calcolaVertice();
+cout << "(" << vertice_calcolato.x
+     << ";" << vertice_calcolato.y
+     << ")" << endl;
+```
+````
+
+</div>
+<div class="flex flex-col gap-3">
+
+<div class="p-3 rounded-lg border-2 border-gray-400">
+<div class="text-xs uppercase opacity-60">Indizio</div>
+
+Il programma **non compila**:
+
+<div class="font-mono text-xs mt-1">error: no match for 'operator<<' (operand types are 'std::ostream' and 'Punto')</div>
+
+</div>
+
+<div v-click="1" class="p-3 rounded-lg bg-red-500/15 border-2 border-red-500 text-sm">
+<div class="text-xs uppercase opacity-60">L'errore</div>
+
+`cout` sa stampare numeri e testi, ma **non** sa come stampare una struct: non sa quali campi stampare, né in che formato
+
+</div>
+
+<div v-click="2" class="p-3 rounded-lg bg-green-500/15 border-2 border-green-500 text-sm">
+<div class="text-xs uppercase opacity-60">La correzione</div>
+
+Si stampano i campi **uno alla volta**: `vertice_calcolato.x` e `vertice_calcolato.y`
+
+</div>
+
+</div>
+</div>
+
+---
+
+# 🔍 Trova l'errore <span class="text-2xl opacity-50">classi · 6 / 6</span>
+
+<div class="grid grid-cols-2 gap-6 mt-2">
+<div>
+
+````md magic-move
+```cpp {all|3}
+p.setC(c_utente);
+
+vertice_calcolato = calcolaVertice();
+```
+
+```cpp {3}
+p.setC(c_utente);
+
+vertice_calcolato = p.calcolaVertice();
+```
+````
+
+</div>
+<div class="flex flex-col gap-3">
+
+<div class="p-3 rounded-lg border-2 border-gray-400">
+<div class="text-xs uppercase opacity-60">Indizio</div>
+
+Il programma **non compila**:
+
+<div class="font-mono text-xs mt-1">error: 'calcolaVertice' was not declared in this scope</div>
+
+</div>
+
+<div v-click="1" class="p-3 rounded-lg bg-red-500/15 border-2 border-red-500 text-sm">
+<div class="text-xs uppercase opacity-60">L'errore</div>
+
+`calcolaVertice` non è una funzione qualsiasi: è un **metodo** della classe. Va chiamato **su un oggetto**, altrimenti di quale parabola calcolerebbe il vertice?
+
+</div>
+
+<div v-click="2" class="p-3 rounded-lg bg-green-500/15 border-2 border-green-500 text-sm">
+<div class="text-xs uppercase opacity-60">La correzione</div>
+
+Oggetto, punto, metodo: `p.calcolaVertice()`
+
+</div>
+
+</div>
+</div>
+
+---
+
+# Prima di consegnare: la checklist delle classi
+
+<div class="text-lg mt-2 opacity-80">Quando scrivi una classe nel compito, controlla:</div>
+
+<v-clicks>
+
+- ✅ Gli attributi sono **`private`**, i setter e i metodi **`public`**
+- ✅ Il parametro del setter ha un nome **diverso** dall'attributo: `a = val_a;`
+- ✅ Dal `main` si scrive negli attributi **solo** con i setter: `cin >> a_utente;` e poi `p.setA(a_utente);`
+- ✅ La `struct Punto` è definita **prima** della classe
+- ✅ Le **parentesi** nelle formule: `-b/(2*a)` e `-delta/(4*a)`
+- ✅ `delta` si calcola **prima** di usarlo
+- ✅ Un metodo che restituisce un punto ha tipo **`Punto`**, e si chiama **su un oggetto**: `p.calcolaVertice()`
+- ✅ Dopo la graffa della classe c'è il **`;`**: `};`
+
+</v-clicks>
+
+---
+
+# Riepilogo: dal `main` alla classe
+
+<div class="grid grid-cols-2 gap-4 mt-4">
+
+<div v-click class="border-2 border-blue-500 rounded-lg p-4">
+  <div class="text-xs uppercase opacity-60">Passi 1 e 2</div>
+  <div class="font-bold text-lg mb-2">Dal main alla classe</div>
+  <div class="text-sm">I dati diventano <b>attributi</b>, i calcoli diventano <b>metodi</b>, il dialogo con l'utente resta nel <code>main</code></div>
+</div>
+
+<div v-click class="border-2 border-green-500 rounded-lg p-4">
+  <div class="text-xs uppercase opacity-60">Passo 3</div>
+  <div class="font-bold text-lg mb-2">Un metodo, un Punto</div>
+  <div class="text-sm">Invece di <code>getVerticeX</code> e <code>getVerticeY</code>, un solo metodo che restituisce x e y insieme</div>
+  <div class="font-mono text-sm mt-3">Punto calcolaVertice()</div>
+</div>
+
+<div v-click class="border-2 border-purple-500 rounded-lg p-4">
+  <div class="text-xs uppercase opacity-60">Passo 4</div>
+  <div class="font-bold text-lg mb-2">private + setter</div>
+  <div class="text-sm">Gli attributi sono chiusi nella classe: dal <code>main</code> si entra solo dalle porte che la classe decide di aprire</div>
+  <div class="font-mono text-sm mt-3">p.setA(a_utente);</div>
+</div>
+
+<div v-click class="border-2 border-yellow-500 rounded-lg p-4">
+  <div class="text-xs uppercase opacity-60">Il setter</div>
+  <div class="font-bold text-lg mb-2">Nomi diversi</div>
+  <div class="text-sm">Il parametro ha un nome diverso dall'attributo, altrimenti lo nasconde</div>
+  <div class="font-mono text-sm mt-3">void setA(float val_a){ a = val_a; }</div>
+</div>
+
+</div>

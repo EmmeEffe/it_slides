@@ -4,3 +4,8 @@ pre,
 .font-mono {
   font-variant-ligatures: none;
 }
+
+/* Riquadri di testo uno sotto l'altro: meno spazio tra i paragrafi */
+.compatto p {
+  margin: 0.25rem 0;
+}
